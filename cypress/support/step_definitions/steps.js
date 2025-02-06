@@ -226,3 +226,25 @@ When('I remove {string} from the cart',(productName)=>{
 Then('the cart should be empty',()=>{
     cy.get('.shopping-cart-badge').should('not.exist')
 })
+
+When('I go to cart page',()=>{
+    cy.get('[data-test="shopping-cart-link"]').click()
+    cy.get('[data-test="title"]').should('be.visible').and('contain.text','Your Cart')
+})
+
+When('I click the {string} button',(buttonName)=>{
+    cy.contains('button',buttonName).click()
+})
+
+Then('I should be redirected to the products page',()=>{
+    cy.url().should("include", "/inventory.html")
+    cy.get('[data-test="title"]').should('be.visible').and('contain.text','Products')
+})
+
+When('I reload the page',()=>{
+    cy.reload()
+})
+
+Then('I should be on the checkout information page',()=>{
+    cy.get('[data-test="title"]').should('be.visible').and('contain.text','Checkout: Your Information')
+})

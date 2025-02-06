@@ -22,12 +22,15 @@ Background:
     And I remove "Sauce Labs Backpack" from the cart
     Then the cart should be empty
 
+@focus
   Scenario: Continue shopping from the cart page
-    Given I have added "Sauce Labs Backpack" to the cart
-    When I click the "Continue Shopping" button
+    When I add the "Sauce Labs Backpack" to the cart
+    And I go to cart page
+    And I click the "Continue Shopping" button
     Then I should be redirected to the products page
 
   Scenario: Verify cart persistence after page reload
-    Given I have added "Sauce Labs Backpack" to the cart
-    When I reload the page
-    Then the cart badge should still display "1"
+    When I add the "Sauce Labs Backpack" to the cart
+    And I go to cart page
+    And I reload the page
+   Then the cart badge should display "1"

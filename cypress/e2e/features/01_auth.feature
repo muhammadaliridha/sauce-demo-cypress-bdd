@@ -1,12 +1,12 @@
 Feature: Login and Logout Functionality
 
-
+#@focus
 Scenario: Successful Login with valid credentials
 Given I am on the Sauce Demo login page
 When I login with "standard_user"
 Then I should be redirected to the Products page
 
-
+#@focus
 Scenario: Login with locked-out user
 Given I am on the Sauce Demo login page
 When I login with "locked_out_user"
@@ -39,10 +39,10 @@ Scenario: Error message for missing username
 Given I am on the Sauce Demo login page
 When I leave the username field blank
 And I click the "Login" button
-Then I should see an error message "Username is required."
+Then I should see an error message "Username is required"
 
 Scenario: Error message for missing password
 Given I am on the Sauce Demo login page
 When I leave the password field blank
 And I click the "Login" button
-Then I should see an error message "Password is required."
+Then I should see an error message "Password is required"

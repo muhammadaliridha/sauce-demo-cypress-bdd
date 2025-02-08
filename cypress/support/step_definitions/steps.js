@@ -5,8 +5,8 @@ Given('I am on the Sauce Demo login page',()=>{
     cy.get('.login_logo').should('be.visible')
 })
 
-When('I login with "standard_user"',()=>{
-    cy.get('[data-test="username"]').type('standard_user')
+When('I login with {string}',(userName)=>{
+    cy.get('[data-test="username"]').type(userName)
     cy.get('[data-test="password"]').type('secret_sauce')
     cy.get('[data-test="login-button"]').click()    
 })
@@ -16,24 +16,12 @@ Then('I should be redirected to the Products page',()=>{
     cy.get('[data-test="title"]').should('be.visible').and('contain.text','Products')
 })
 
-When('I login with "locked_out_user"',()=>{
-    cy.get('[data-test="username"]').type('locked_out_user')
-    cy.get('[data-test="password"]').type('secret_sauce')
-    cy.get('[data-test="login-button"]').click()
-})
-
-Then('I should see an error message "Sorry, this user has been locked out."',()=>{
-    cy.get('[data-test="error"]').should('be.visible').and('contain.text','Sorry, this user has been locked out.')
+Then('I should see an error message {string}',(errorMessage)=>{
+    cy.get('[data-test="error"]').should('be.visible').and('contain.text',errorMessage)
 })
 
 Then('I should remain on the login page',()=>{
     cy.get('.login_logo').should('be.visible')
-})
-
-When('I login with "performance_glitch_user"',()=>{
-    cy.get('[data-test="username"]').type('performance_glitch_user')
-    cy.get('[data-test="password"]').type('secret_sauce')
-    cy.get('[data-test="login-button"]').click()
 })
 
 Then('the page load time should be noticeably slower than for other users',()=>{
@@ -55,12 +43,6 @@ Then('the page load time should be noticeably slower than for other users',()=>{
         // Assert that the user is redirected to the Products page
         cy.url().should("include", "/inventory.html")
       })      
-})
-
-When('I login with "problem_user"',()=>{
-    cy.get('[data-test="username"]').type('problem_user')
-    cy.get('[data-test="password"]').type('secret_sauce')
-    cy.get('[data-test="login-button"]').click()
 })
 
 Then('product images or links should be incorrect or broken',()=>{
@@ -87,12 +69,8 @@ Then('product images or links should be incorrect or broken',()=>{
 })
 
 Given('I am logged in as a standard user',()=>{
-    cy.visit('https://www.saucedemo.com/')
-    cy.get('[data-test="username"]').type('standard_user')
-    cy.get('[data-test="password"]').type('secret_sauce')
-    cy.get('[data-test="login-button"]').click()
-    cy.url().should("include", "/inventory.html")
-    cy.get('[data-test="title"]').should('be.visible').and('contain.text','Products')
+    cy.loginAsStandardUser()
+    
 })
 
 When('I click the menu button',()=>{
@@ -112,20 +90,12 @@ When('I leave the username field blank',()=>{
     cy.get('[data-test="password"]').type('secret_sauce')
 })
 
-When('I click the "Login" button',()=>{
-    cy.get('[data-test="login-button"]').click()
-})
-
-Then('I should see an error message "Username is required."',()=>{
-    cy.get('[data-test="error"]').should('contain.text','Username is required')
+When('I click the {string} button',(buttonName)=>{
+    cy.contains('button, input[type="submit"]', buttonName).click()
 })
 
 When('I leave the password field blank',()=>{
     cy.get('[data-test="username"]').type('standard_user')
-})
-
-Then('I should see an error message "Password is required."',()=>{
-    cy.get('[data-test="error"]').should('contain.text','Password is required')
 })
 
 When('I am on the Products page',()=>{
@@ -205,7 +175,7 @@ When('I click the Back to Products button',()=>{
 })
 
 When('I add the {string} to the cart',(productName)=>{
-    cy.contains(productName).parents('.inventory_item').find('button').click();
+    cy.contains(productName).parents('.inventory_item').find('button').click()
 })
 
 Then('the cart badge should display {string}',(itemCount)=>{
@@ -214,7 +184,7 @@ Then('the cart badge should display {string}',(itemCount)=>{
 
 When('I add the following products to the cart:',(dataTable)=>{
     dataTable.rawTable.forEach(([productName])=>{
-        cy.contains(productName).parents('.inventory_item').find('button').click();
+        cy.contains(productName).parents('.inventory_item').find('button').click()
     })
 })
 
@@ -232,10 +202,6 @@ When('I go to cart page',()=>{
     cy.get('[data-test="title"]').should('be.visible').and('contain.text','Your Cart')
 })
 
-When('I click the {string} button',(buttonName)=>{
-    cy.contains('button',buttonName).click()
-})
-
 Then('I should be redirected to the products page',()=>{
     cy.url().should("include", "/inventory.html")
     cy.get('[data-test="title"]').should('be.visible').and('contain.text','Products')
@@ -247,4 +213,45 @@ When('I reload the page',()=>{
 
 Then('I should be on the checkout information page',()=>{
     cy.get('[data-test="title"]').should('be.visible').and('contain.text','Checkout: Your Information')
+})
+
+Given('I am on the checkout information page',()=>{
+    cy.get('[data-test="add-to-cart-sauce-labs-backpack"]').click()
+    cy.get('.shopping_cart_link').click()
+    cy.contains('button', 'Checkout').click()
+})
+
+When('I fill in the checkout form with valid information:',(dataTable)=>{
+    const data = dataTable.rowsHash()
+    if (data['First Name']) cy.get('[data-test="firstName"]').type(data['First Name'])
+    if (data['Last Name']) cy.get('[data-test="lastName"]').type(data['Last Name'])
+    if (data['Postal Code']) cy.get('[data-test="postalCode"]').type(data['Postal Code'])
+})
+
+Then('I should see the "Thank you for your order!" message',()=>{
+    cy.get('[data-test="complete-header"]').should('be.visible').and('contain.text','Thank you for your order!')
+})
+
+When('I click the {string} button without filling in any fields',(buttonName)=>{
+    cy.contains('button, input[type="submit"]', buttonName).click()
+})
+
+/*
+Then('I should see an error message {string}',(alertText)=>{
+    cy.get('.error-message-container').should('be.visible')
+    cy.contains(alertText).should('contain.text',alertText)
+})
+*/
+
+When('I fill in the checkout form with missing postal code:',(dataTable)=>{
+    const data = dataTable.rowsHash()
+    if (data['First Name']) cy.get('[data-test="firstName"]').type(data['First Name'])
+    if (data['Last Name']) cy.get('[data-test="lastName"]').type(data['Last Name'])
+})
+
+When('I fill in the checkout form with an invalid postal code:',(dataTable)=>{
+    const data = dataTable.rowsHash()
+    if (data['First Name']) cy.get('[data-test="firstName"]').type(data['First Name'])
+    if (data['Last Name']) cy.get('[data-test="lastName"]').type(data['Last Name'])
+    if (data['Postal Code']) cy.get('[data-test="postalCode"]').type(data['Postal Code'])
 })

@@ -7,3 +7,4 @@ package-lock.json
 cypress/downloads/
 .vscode/
 cypress/fixtures
+cypress/reports
